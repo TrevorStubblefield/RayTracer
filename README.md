@@ -1,0 +1,1 @@
+This a project that will be worked on over the course of CS410 Introduction to Computer Graphics. In the end, it will be a ray tracer implemented in C++.

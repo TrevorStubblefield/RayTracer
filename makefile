@@ -8,12 +8,12 @@ CFLAGS=-I. -Wall -g
 LINK=
 
 DEPS=
-OBJS=main.o
+OBJS=build/main.o
 
-all: | geonorm
+all: | bin/geonorm
 
 clean:
-	-rm -f *.o geonorm
+	-rm -f build/* bin/geonorm
 
 #Main.o: Main.cpp $(DEPS)
 #	$(CC) -c -o $@ $< $(CFLAGS)
@@ -24,10 +24,10 @@ clean:
 #Song.o: Song.cpp $(DEPS)
 #	$(CC) -c -o $@ $< $(CFLAGS)
 
-%.o: %.cpp $(DEPS)
+build/%.o: src/%.cpp $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-geonorm: $(OBJS)
+bin/geonorm: $(OBJS)
 	$(CC) -o $@ $^ $(CFLAGS) $(LINK)
 
 .PHONY: all clean
