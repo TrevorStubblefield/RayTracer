@@ -1,19 +1,34 @@
 #include <iostream>
 #include <fstream>
+#include "model.h"
+#include "vertex.h"
+#include "face.h"
+#include "util.h"
 using namespace std;
 
-int main(int args, char* argv[]){
+int main(int args, const char* argv[]){
 
-	string line;
-	ifstream inputFile;
-	inputFile.open(argv[1]);
+	//get the filename
+	string file = string(argv[1]);
 
-	if (inputFile.is_open()){
-		while( getline(inputFile,line) ){
-			cout << line << endl;
-		}
-		inputFile.close();
-	}
+	//create the models
+	Model model = ReadPLYFile(file);
+
+	Model* pmodel = &model;
+	Model centeredModel = pmodel->center();
+	//cout << centeredModel.findStdDev().toString() << endl;
+	Model roundedModel = centeredModel.round();
+
+	//create the new filenames
+	int found = file.find('.');
+	string centered = file.substr(0,found) + string("_centered.ply");
+	string rounded = file.substr(0,found) + string("_rounded.ply");
+
+	//TODO: Center
+	WritePLYFile(centered,centeredModel);
+
+	//TODO: Round
+	WritePLYFile(rounded,roundedModel);
 	
 	return 0;
 }
