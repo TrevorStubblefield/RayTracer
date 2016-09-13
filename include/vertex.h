@@ -19,6 +19,7 @@ public:
 	double getY();
 	double getZ();
 	string toString();
+	string toStringCommas();
 };
 
 #endif

@@ -39,3 +39,14 @@ string Vertex::toString(){
 	string s = strs.str();
 	return s;
 }
+
+string Vertex::toStringCommas(){
+	ostringstream strs;
+	strs << xCoordinate;
+	strs << ", ";
+	strs << yCoordinate;
+	strs << ", ";
+	strs << zCoordinate;
+	string s = strs.str();
+	return s;
+}

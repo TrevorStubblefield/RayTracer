@@ -22,6 +22,7 @@ public:
 	vector<Face> getFaces();
 	Vertex findMean();
 	Vertex findStdDev();
+	string boundingBox();
 };
 
 #endif

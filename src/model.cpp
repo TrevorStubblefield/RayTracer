@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <math.h>
+#include <sstream>
 #include "model.h"
 #include "vertex.h"
 #include "face.h"
@@ -104,4 +105,51 @@ Vertex Model::findStdDev(){
 	Vertex stdDev(0, stdDevX, stdDevY, stdDevZ);
 	return stdDev;
 }
+
+string Model::boundingBox(){
+	double minX = vertices[0].getX();
+	double minY = vertices[0].getY();
+	double minZ = vertices[0].getZ();
+	double maxX = vertices[0].getX();
+	double maxY = vertices[0].getY();
+	double maxZ = vertices[0].getZ();
+
+	for (int i = 0; i < vertices.size(); i++){
+		double currentX = vertices[i].getX();
+		double currentY = vertices[i].getY();
+		double currentZ = vertices[i].getZ();
+		if(currentX < minX)
+			minX = currentX;
+		if(currentY < minY)
+			minY = currentY;
+		if(currentZ < minZ)
+			minZ = currentZ;
+		if(currentX > maxX)
+			maxX = currentX;
+		if(currentY > maxY)
+			maxY = currentY;
+		if(currentZ > maxZ)
+			maxZ = currentZ;
+	}
+	ostringstream strs;
+	strs << "Bounding Box: ";
+	strs << minX;
+	strs << " <= x <= ";
+	strs << maxX;
+	strs << ", ";
+	strs << minY;
+	strs << " <= y <= ";
+	strs << maxY;
+	strs << ", ";
+	strs << minZ;
+	strs << " <= z <= ";
+	strs << maxZ;
+
+	string s = strs.str();
+	return s;
+}
+
+
+
+
 
