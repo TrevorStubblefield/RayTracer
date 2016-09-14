@@ -96,8 +96,5 @@ int WritePLYFile(string filename, Model model){
 		}
 	}
 
-
-
-
 	return 0;
 }
