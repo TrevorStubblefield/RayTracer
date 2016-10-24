@@ -13,11 +13,12 @@ Scene::Scene(Camera c, Model m) {
 	model = m;
 }
 
-void Scene::buildOrigin() {
-	vector<double> wVector = vectorSubtraction(camera.eye, camera.look);
+void Scene::buildScene() {
+	//Calculate U,V,W
+	vector<double> wVector = vectorSubtraction(camera.look, camera.eye);
 	wVector = vectorNormalize(wVector);
 	vector<double> uVector = vectorCrossProduct(camera.up, wVector);
+	vVector = vectorNormalize(vVector);
 	vector<double> vVector = vectorCrossProduct(wVector, uVector);
-
 
 }

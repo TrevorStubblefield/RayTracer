@@ -13,7 +13,7 @@ private:
 public:
 	Scene();
 	Scene(Camera c, Model m);
-	void buildOrigin();
+	void buildScene();
 };
 
 
