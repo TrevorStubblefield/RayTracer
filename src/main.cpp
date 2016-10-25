@@ -4,10 +4,18 @@
 #include "vertex.h"
 #include "face.h"
 #include "util.h"
+#include "camera.h"
+
 using namespace std;
 
-int main(int args, const char* argv[]){
+int mainPA1(int args, const char* argv[]);
+int mainPA2(int args, const char* argv[]);
 
+int main(int args, const char* argv[]){
+	return mainPA2(args, argv);
+}
+
+int mainPA1(int args, const char* argv[]){
 	//get the filename
 	string file = string(argv[1]);
 
@@ -71,5 +79,17 @@ int main(int args, const char* argv[]){
 	//Write the rounded model to file.
 	WritePLYFile(rounded,roundedModel);
 	
+	return 0;
+}
+
+int mainPA2(int args, const char* argv[]){
+
+	string cameraFile = string(argv[1]);
+	string modelFile = string(argv[2]);
+	string outputFile = string(argv[3]);
+
+	Model model = ReadPLYFile(modelFile);
+	Camera camera = ReadCameraFile(cameraFile);
+
 	return 0;
 }

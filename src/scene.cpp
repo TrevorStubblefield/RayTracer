@@ -18,7 +18,7 @@ void Scene::buildScene() {
 	vector<double> wVector = vectorSubtraction(camera.look, camera.eye);
 	wVector = vectorNormalize(wVector);
 	vector<double> uVector = vectorCrossProduct(camera.up, wVector);
-	vVector = vectorNormalize(vVector);
+	uVector = vectorNormalize(uVector);
 	vector<double> vVector = vectorCrossProduct(wVector, uVector);
 
 }

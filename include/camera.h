@@ -5,18 +5,22 @@
 #include "vertex.h"
 #include "face.h"
 
+using namespace std;
+
 class Camera
 {
-private:
-	vector<int> eye;
-	vector<int> look;
-	vector<int> up;
-	vector<int> distance;
-	vector<int> bounds;
-	vector<int> res;
 public:
+	vector<double> eye;
+	vector<double> look;
+	vector<double> up;
+	vector<double> distance;
+	vector<double> bounds;
+	vector<double> res;
+
 	Camera();
-	Camera(vector<int> a, vector<int> b, vector<int> c, vector<int> d, vector<int> e, vector<int> f);
+	Camera(vector<double> a, vector<double> b, vector<double> c, vector<double> d, vector<double> e, vector<double> f);
+	string toString();
+};
 
 #endif
 

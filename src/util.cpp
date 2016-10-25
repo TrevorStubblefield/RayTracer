@@ -5,8 +5,11 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <math.h>
 #include "model.h"
 #include "util.h"
+#include "camera.h"
+
 using namespace std;
 
 Model ReadPLYFile(string filename){
@@ -98,3 +101,82 @@ int WritePLYFile(string filename, Model model){
 
 	return 0;
 }
+
+Camera ReadCameraFile(string filename){
+
+	int i = 1;
+	vector<double> a;
+	vector<double> b;
+	vector<double> c;
+	vector<double> d;
+	vector<double> e;
+	vector<double> f;
+
+	string line;
+	ifstream input;
+	input.open(filename);
+
+	if (input.is_open()){
+		while( getline(input,line) ){
+			int index = line.find(' ');
+			string a = line.substr(index, line.length()-1);
+
+			string buf;
+    		stringstream ss(a);
+    		while (ss >> buf){
+        		if (i == 1)
+					a.push_back(stod(buf));
+				else if (i == 2)
+					b.push_back(stod(buf));
+				else if (i == 3)
+					c.push_back(stod(buf));
+				else if (i == 4)
+					d.push_back(stod(buf));
+				else if (i == 5)
+					e.push_back(stod(buf));
+				else if (i == 6)
+					f.push_back(stod(buf));
+        	}
+
+			i++;
+		}
+	}
+	return Camera(a,b,c,d,e,f);
+}
+
+vector<double> vectorSubtraction(vector<double> a, vector<double> b){
+	vector <double> c;
+	c.push_back(a[0]-b[0]);
+	c.push_back(a[1]-b[1]);
+	c.push_back(a[2]-b[2]);
+
+	return c;
+}
+vector<double> vectorAddition(vector<double> a, vector<double> b){
+	vector <double> c;
+	c.push_back(a[0]+b[0]);
+	c.push_back(a[1]+b[1]);
+	c.push_back(a[2]+b[2]);
+
+	return c;
+}
+vector<double> vectorNormalize(vector<double> a){
+	vector <double> b;
+	double length = (a[0]*a[0]) + (a[1]*a[1]) + (a[2]*a[2]);
+	double sqrtLength = sqrt(length);
+	b.push_back(a[0]/sqrtLength);
+	b.push_back(a[1]/sqrtLength);
+	b.push_back(a[2]/sqrtLength);
+
+	return b;
+}
+
+vector<double> vectorCrossProduct(vector<double> a, vector<double> b){
+	vector<double> c;
+	c.push_back( (a[1]*b[2]) - (a[2]*b[1]) );
+	c.push_back( (a[2]*b[0]) - (a[0]*b[2]) );
+	c.push_back( (a[0]*b[1]) - (a[1]*b[0]) );
+
+	return c;
+}
+

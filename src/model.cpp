@@ -148,8 +148,3 @@ string Model::boundingBox(){
 	string s = strs.str();
 	return s;
 }
-
-
-
-
-

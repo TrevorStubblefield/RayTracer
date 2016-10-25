@@ -6,3 +6,7 @@ bin/*
 
 #ignore mac specific files
 .DS_Store
+
+#ignore VS Code files
+.vscode/
+src/.vscode/
