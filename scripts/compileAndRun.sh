@@ -1,4 +1,3 @@
 #!/bin/bash
 
-make
-./bin/geonorm $1
+./bin/raytracer $1 $2 $3

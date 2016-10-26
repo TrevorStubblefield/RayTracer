@@ -139,14 +139,30 @@ double Scene::calculateT(vector <double> ray) {
 		double az = triangleA[2];
 
 		double bx = triangleB[0];
+		double by = triangleB[1];
+		double bz = triangleB[2];
+
+		double cx = triangleC[0];
+		double cy = triangleC[1];
+		double cz = triangleC[2];
+
+		double dx = ray[0];
+		double dy = ray[1];
+		double dz = ray[2];
+
+		double lx = camera.eye[0];
+		double ly = camera.eye[1];
+		double lz = camera.eye[2];
+
+		double z = ((az-cz)*dy-(ay-cy)*dz)*(ax-bx)-((az-cz)*dx - (ax-cx)*dz)*(ay - by) + ((ay-cy)*dx - (ax - cx)*dy*(az-bz));
 
 		if (z != 0) {
-			beta = ((j*d) - (k*e) + (l*f)) / z;
+			double beta = (((az - cz)*dy - (ay-cy)*dz)*(ax-lx) - ((az-cz)*dx - (ax-cx)*dz)*(ay - ly) + ((ay-cy)*dx - (ax-cx)*dy)*(az-lz)) / z;
 
-			gamma = ((m*g) - (n*h) + (o*i)) / z;
+			double gamma = (((az-lz)*dy - (ay-ly)*dz)*(ax-bx) - ((az - lz)*dx - (ax-lx)*dz)*(ay-by) + ((ay - ly)*dx - (ax - lx)*dy)*(az-bz)) / z;
 
 			if ( beta >= 0 && beta <= 1 && gamma >= 0 && gamma <= 1 && (beta+gamma) <= 1 )
-				t = (p - q + r) / z;
+				t = (((ay-ly)*(az-cz)-(ay-cy)*(az-lz))*(ax-bx) - ((ax-lx)*(az-cz)-(ax-cx)*(az-lz))*(ay-by)+((az-lz)*(ay-cy)-(ax-cx)*(ay-ly)) *(az-bz)) / z;
 
 			if (t >= 0 && t < minDistance)
 				minDistance = t;

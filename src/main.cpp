@@ -96,7 +96,7 @@ int mainPA2(int args, const char* argv[]){
 	Scene scene(camera, model);
 	scene.buildScene();
 
-	system("pause");
+	//system("pause");
 
 	return 0;
 }
