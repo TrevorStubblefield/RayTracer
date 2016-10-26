@@ -16,6 +16,6 @@ vector<double> vectorSubtraction(vector<double> a, vector<double> b);
 vector<double> vectorAddition(vector<double> a, vector<double> b);
 vector<double> vectorCrossProduct(vector<double> a, vector<double> b);
 vector<double> vectorNormalize(vector<double> a);
-
+vector<double> vectorScalar(vector<double> a, double b);
 
 #endif

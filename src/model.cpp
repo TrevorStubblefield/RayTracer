@@ -148,3 +148,12 @@ string Model::boundingBox(){
 	string s = strs.str();
 	return s;
 }
+
+vector<double> Model::findTriangle(int id) {
+
+	for (int i = 0; i < vertices.size(); i++) {
+		if (vertices[i].id == id) {
+			return vertices[i].getTriangleFromId(id);
+		}
+	}
+}

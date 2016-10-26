@@ -51,5 +51,4 @@ string Camera::toString(){
 	}
 
 	return s;
-	return "";
 }

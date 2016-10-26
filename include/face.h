@@ -7,11 +7,11 @@ using namespace std;
 
 class Face
 {
-private:
+public:
 	int size;
 	vector<int> vec;
+	int idA, idB, idC;
 
-public:
 	Face ();
 	Face (int s, vector<int> v);
 	string toString();

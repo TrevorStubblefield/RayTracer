@@ -11,6 +11,9 @@ Face::Face(){}
 Face::Face(int s, vector<int> v){
 	size = s;
 	vec = v;
+	idA = v[0];
+	idB = v[1];
+	idC = v[2];
 }
 
 string Face::toString(){

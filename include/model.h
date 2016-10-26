@@ -9,11 +9,10 @@ using namespace std;
 
 class Model
 {
-private:
+public:
 	vector<Vertex> vertices;
 	vector<Face> faces;
 
-public:
 	Model();
 	Model(vector<Vertex> v, vector<Face> f);
 	Model center();
@@ -23,6 +22,7 @@ public:
 	Vertex findMean();
 	Vertex findStdDev();
 	string boundingBox();
+	vector<double> findTriangle(int id);
 };
 
 #endif

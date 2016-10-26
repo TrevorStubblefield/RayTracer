@@ -1,10 +1,12 @@
 #include <iostream>
 #include <fstream>
+#include <vector>
 #include "model.h"
 #include "vertex.h"
 #include "face.h"
 #include "util.h"
 #include "camera.h"
+#include "scene.h"
 
 using namespace std;
 
@@ -90,6 +92,11 @@ int mainPA2(int args, const char* argv[]){
 
 	Model model = ReadPLYFile(modelFile);
 	Camera camera = ReadCameraFile(cameraFile);
+
+	Scene scene(camera, model);
+	scene.buildScene();
+
+	system("pause");
 
 	return 0;
 }

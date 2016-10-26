@@ -10,3 +10,13 @@ bin/*
 #ignore VS Code files
 .vscode/
 src/.vscode/
+
+#ignore Visual Studio Files
+RayTracer.sdf
+RayTracer.sln
+RayTracer.VC.opendb
+RayTracer.vcxproj
+RayTracer.vcxproj.filters
+RayTracer.vcxproj.user
+Debug/
+.vs/

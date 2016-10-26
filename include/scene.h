@@ -3,17 +3,28 @@
 
 #include "camera.h"
 #include "model.h"
+#include "face.h"
 
 using namespace std;
 
 class Scene {
-private:
+public:
 	Camera camera;
 	Model model;
-public:
+	double ex, ey, ez;
+	double lx, ly, lz;
+	double ux, uy, uz;
+	double right, left, top, bottom;
+	double near;
+	double width, height;
+	vector<double> wVector, uVector, vVector;
+
 	Scene();
 	Scene(Camera c, Model m);
 	void buildScene();
+	vector<double> calculateRay(int i, int j);
+	double calculateT(vector <double> ray);
+	vector<double> colorPixel(double t, double tmin, double tmax);
 };
 
 

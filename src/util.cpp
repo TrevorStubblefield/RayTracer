@@ -119,10 +119,10 @@ Camera ReadCameraFile(string filename){
 	if (input.is_open()){
 		while( getline(input,line) ){
 			int index = line.find(' ');
-			string a = line.substr(index, line.length()-1);
+			string fixedLine = line.substr(index, line.length()-1);
 
 			string buf;
-    		stringstream ss(a);
+			stringstream ss(fixedLine);
     		while (ss >> buf){
         		if (i == 1)
 					a.push_back(stod(buf));
@@ -170,7 +170,10 @@ vector<double> vectorNormalize(vector<double> a){
 
 	return b;
 }
-
+vector<double> vectorScalar(vector<double> a, double b) {
+	vector <double> c = { a[0]*b,a[1]*b,a[2]*b };
+	return c;
+}
 vector<double> vectorCrossProduct(vector<double> a, vector<double> b){
 	vector<double> c;
 	c.push_back( (a[1]*b[2]) - (a[2]*b[1]) );
