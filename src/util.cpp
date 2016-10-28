@@ -1,6 +1,7 @@
 //Utilites
 
 #include <iostream>
+#include <unordered_map>
 #include <fstream>
 #include <vector>
 #include <string>
@@ -9,6 +10,7 @@
 #include "model.h"
 #include "util.h"
 #include "camera.h"
+#include "pixel.h"
 
 using namespace std;
 
@@ -16,6 +18,8 @@ Model ReadPLYFile(string filename){
 
 	string line;
 	ifstream input;
+
+	unordered_map<int, Vertex> vertexMap;
 
 	vector<Vertex> vertices;
 	vector<Face> faces;
@@ -49,6 +53,7 @@ Model ReadPLYFile(string filename){
         			}
         			Vertex v(i, tokens);
         			vertices.push_back(v);
+					vertexMap.insert({ i, v });
 				}
 
 				for (int i = 0; i < numFaces; i++) {
@@ -61,7 +66,10 @@ Model ReadPLYFile(string filename){
     				while (ss >> buf){
         				tokens.push_back(stod(buf));
         			}
-        			Face f(size, tokens);
+					Vertex a = vertexMap[tokens[0]];
+					Vertex b = vertexMap[tokens[1]];
+					Vertex c = vertexMap[tokens[2]];
+        			Face f(a, b, c);
         			faces.push_back(f);
 				}
 			}

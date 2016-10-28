@@ -17,7 +17,7 @@ public:
 	double getX();
 	double getY();
 	double getZ();
-	vector<double> getTriangleFromId(int i);
+	vector<double> getTriangle();
 	string toString();
 	string toStringCommas();
 };

@@ -153,7 +153,7 @@ vector<double> Model::findTriangle(int id) {
 
 	for (int i = 0; i < vertices.size(); i++) {
 		if (vertices[i].id == id) {
-			return vertices[i].getTriangleFromId(id);
+			return vertices[i].getTriangle();
 		}
 	}
 }

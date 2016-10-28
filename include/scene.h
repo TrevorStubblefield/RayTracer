@@ -21,10 +21,10 @@ public:
 
 	Scene();
 	Scene(Camera c, Model m);
-	void buildScene();
+	void buildScene(string filename);
 	vector<double> calculateRay(int i, int j);
 	double calculateT(vector <double> ray);
-	vector<double> colorPixel(double t, double tmin, double tmax);
+	vector<unsigned int> colorPixel(double t, double tmin, double tmax);
 };
 
 

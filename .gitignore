@@ -4,6 +4,9 @@ build/*
 #ignore executables
 bin/*
 
+#ignore created images
+models/images/output.ppm
+
 #ignore mac specific files
 .DS_Store
 
@@ -20,3 +23,4 @@ RayTracer.vcxproj.filters
 RayTracer.vcxproj.user
 Debug/
 .vs/
+x64/

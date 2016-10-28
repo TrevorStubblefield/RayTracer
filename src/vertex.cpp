@@ -29,11 +29,9 @@ double Vertex::getY(){return yCoordinate;}
 
 double Vertex::getZ(){return zCoordinate;}
 
-vector<double> Vertex::getTriangleFromId(int i) {
-	if (id == i) {
+vector<double> Vertex::getTriangle() {
 		vector<double> triangle = {xCoordinate, yCoordinate, zCoordinate};
 		return triangle;
-	}
 }
 
 string Vertex::toString(){

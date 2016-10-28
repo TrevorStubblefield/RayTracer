@@ -3,6 +3,7 @@
 
 #include "model.h"
 #include "camera.h"
+#include "pixel.h"
 #include <string>
 #include <vector>
 

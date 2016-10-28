@@ -1,6 +1,7 @@
 //Scene class
 
 #include <iostream>
+#include <fstream>
 #include <math.h>
 #include "scene.h"
 #include "camera.h"
@@ -8,6 +9,7 @@
 #include "util.h"
 #include "face.h"
 #include "vertex.h"
+#include "pixel.h"
 
 using namespace std;
 
@@ -28,10 +30,10 @@ Scene::Scene(Camera c, Model m) {
 	uy = camera.up[1];
 	uz = camera.up[2];
 
-	right = camera.bounds[0];
+	bottom = camera.bounds[0];
 	left = camera.bounds[1];
 	top = camera.bounds[2];
-	bottom = camera.bounds[3];
+	right = camera.bounds[3];
 
 	near = -camera.distance[0];
 
@@ -48,14 +50,14 @@ Scene::Scene(Camera c, Model m) {
 	vVector = vectorCrossProduct(wVector, uVector);
 }
 
-void Scene::buildScene() {
+void Scene::buildScene(string filename) {
 
 	vector<Face> faces = model.getFaces();
 	vector<Vertex> vertices = model.getVertices();
 
 	vector<double> ray;
 	vector<double> tVector;
-	vector<double> coloredPixel;
+	vector<unsigned int> coloredPixel;
 
 	vector< vector<double> > tMatrix;
 	vector<double> tRows;
@@ -64,42 +66,43 @@ void Scene::buildScene() {
 	double tmin = INFINITY;
 	double tmax = 0;
 
-	//1. create rays
-	//2. calculate t for rays.
-	//3. Find tmin and tmax.
 
-	//Second iteration
-	//3. color pixel.
-	//4. write to file.
-	for (int i = 0; i < width; i++) {
+	for (int i = 0; i < height; i++) {
 		tRows.clear();
-		for (int j = 0; j < height; j++) {
+		for (int j = width-1; j >= 0; j--) {
 
-			ray = calculateRay(i, j);
+			ray = calculateRay(j, i);
 			t = calculateT(ray);
 			tRows.push_back(t);
 			if (t < tmin)
 				tmin = t;
-			if (t > tmax)
+			if (t != INFINITY && t > tmax)
 				tmax = t;
 		}
 		tMatrix.push_back(tRows);
 	}
 
-	for (int i = 0; i < width; i++) {
-		for (int j = 0; j < height; j++) {
-			coloredPixel = colorPixel(tMatrix[i][j], tmin, tmax);
-			cout << tMatrix[i][j] << endl;
-			//cout << coloredPixel[0] << " " << coloredPixel[1] << " " << coloredPixel[2] << endl;
+	ofstream outfile(filename);
+	if (outfile.is_open())
+	{
+		outfile << "P3\n";
+		outfile << width << " " << height << " 255\n";
+		for (int i = height - 1; i >= 0; i--) {
+			for (int j = width-1; j >= 0; j--) {
+				Pixel p = colorPixel(tMatrix[i][j], tmin, tmax);
+				outfile << p.printColors();
+			}
+			outfile << "\n";
 		}
 	}
-
 }
 
 
 vector<double> Scene::calculateRay(int i , int j) {
 	double px = i / (width - 1)*(right - left) + left;
+	px *= width / height;
 	double py = j / (height - 1)*(top - bottom) + bottom;
+	py *= height / width;
 	vector<double> pixpt = vectorAddition(camera.eye,
 		vectorAddition(vectorScalar(wVector, near),
 			vectorAddition(vectorScalar(uVector,px),vectorScalar(vVector,py))));
@@ -110,41 +113,47 @@ vector<double> Scene::calculateRay(int i , int j) {
 	return ray;
 }
 
-vector<double> Scene::colorPixel(double t, double tmin, double tmax) {
+vector<unsigned int> Scene::colorPixel(double t, double tmin, double tmax) {
+	
 	double ratio = 2 * (t - tmin) / (tmax - tmin);
-	double r = fmax(0, 255 * (1 - ratio));
-	double b = fmax(0, 255 * (ratio - 1));
-	double g = 255 - b - r;
+	unsigned int r = fmax(0, 255 * (1 - ratio));
+	unsigned int b = fmax(0, 255 * (ratio - 1));
+	unsigned int g = 255 - b - r;
 
-	vector<double> coloredPixel = {r,b,g};
+	if (t >= INFINITY) {
+		r = 239;
+		b = 239;
+		g = 239;
+	}
+
+	vector<unsigned int> coloredPixel = {r,b,g};
 	return coloredPixel;
 }
 
 double Scene::calculateT(vector <double> ray) {
 	//x = 0, y = 1, z = 2
-	vector<Face> faces = model.faces;
-	vector<double> triangleA, triangleB, triangleC;
+	vector<Face> *faces = &model.faces;
 
 	double minDistance = INFINITY;
 	double t = -1;
 
-	for (int currentFace = 0; currentFace < faces.size(); currentFace++) {
+	for (int currentFace = 0; currentFace < faces->size(); currentFace++) {
 
-		triangleA = model.findTriangle(faces[currentFace].idA);
-		triangleB = model.findTriangle(faces[currentFace].idB);
-		triangleC = model.findTriangle(faces[currentFace].idC);
+		Vertex* vertex1 = &(faces->at(currentFace).v1);
+		Vertex* vertex2 = &(faces->at(currentFace).v2);
+		Vertex* vertex3 = &(faces->at(currentFace).v3);
 		
-		double ax = triangleA[0];
-		double ay = triangleA[1];
-		double az = triangleA[2];
+		double ax = vertex1->xCoordinate;
+		double ay = vertex1->yCoordinate;
+		double az = vertex1->zCoordinate;
 
-		double bx = triangleB[0];
-		double by = triangleB[1];
-		double bz = triangleB[2];
+		double bx = vertex2->xCoordinate;
+		double by = vertex2->yCoordinate;
+		double bz = vertex2->zCoordinate;
 
-		double cx = triangleC[0];
-		double cy = triangleC[1];
-		double cz = triangleC[2];
+		double cx = vertex3->xCoordinate;
+		double cy = vertex3->yCoordinate;
+		double cz = vertex3->zCoordinate;
 
 		double dx = ray[0];
 		double dy = ray[1];
@@ -154,20 +163,37 @@ double Scene::calculateT(vector <double> ray) {
 		double ly = camera.eye[1];
 		double lz = camera.eye[2];
 
-		double z = ((az-cz)*dy-(ay-cy)*dz)*(ax-bx)-((az-cz)*dx - (ax-cx)*dz)*(ay - by) + ((ay-cy)*dx - (ax - cx)*dy*(az-bz));
+		double a = (az - cz);
+		double b = (ay - cy);
+		double c = (ax - bx);
+		double d = (ax - cx);
+		double e = (az - bz);
+		double f = (ay - by);
+		double j = (a*dy - b*dz);
+		double k = (a*dx - d*dz);
+		double l = (b*dx - d*dy);
 
-		if (z != 0) {
-			double beta = (((az - cz)*dy - (ay-cy)*dz)*(ax-lx) - ((az-cz)*dx - (ax-cx)*dz)*(ay - ly) + ((ay-cy)*dx - (ax-cx)*dy)*(az-lz)) / z;
+		double denom = (j*c) - (k*f) + (l*e);
+		if (denom != 0) {
+			double g = (ax - lx);
+			double h = (ay - ly);
+			double i = (az - lz);
 
-			double gamma = (((az-lz)*dy - (ay-ly)*dz)*(ax-bx) - ((az - lz)*dx - (ax-lx)*dz)*(ay-by) + ((ay - ly)*dx - (ax - lx)*dy)*(az-bz)) / z;
+			double beta = ((j*g) - (k*h) + (l*i)) / denom;
+			if (beta >= 0) {
 
-			if ( beta >= 0 && beta <= 1 && gamma >= 0 && gamma <= 1 && (beta+gamma) <= 1 )
-				t = (((ay-ly)*(az-cz)-(ay-cy)*(az-lz))*(ax-bx) - ((ax-lx)*(az-cz)-(ax-cx)*(az-lz))*(ay-by)+((az-lz)*(ay-cy)-(ax-cx)*(ay-ly)) *(az-bz)) / z;
+				double gamma = (((i*dy - h*dz)*c) - ((i*dx - g*dz)*f) + ((h*dx - g*dy)*e)) / denom;
 
-			if (t >= 0 && t < minDistance)
-				minDistance = t;
+				if ((gamma >= 0) && ((beta + gamma) <= 1)) {
+
+					t = (((h*a - b*i)*c) - ((g*a - d*i)*f) + ((g*b - d*h)*e)) / denom;
+
+					if (t > 0 && t < minDistance) {
+						minDistance = t;
+					}
+				}
+			}
 		}
-
 	}
 
 	return minDistance;

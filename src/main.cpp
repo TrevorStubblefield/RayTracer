@@ -94,9 +94,10 @@ int mainPA2(int args, const char* argv[]){
 	Camera camera = ReadCameraFile(cameraFile);
 
 	Scene scene(camera, model);
-	scene.buildScene();
 
-	//system("pause");
+	scene.buildScene(outputFile);
+
+	system("pause");
 
 	return 0;
 }
