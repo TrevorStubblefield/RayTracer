@@ -17,12 +17,17 @@ public:
 	double right, left, top, bottom;
 	double near;
 	double width, height;
+	vector<double> ambient;
+	unordered_map<string, vector<double>> lights;
+	unordered_map<string, vector<double>> spheres;
+	unordered_map<string, Model> models;
 	vector<double> wVector, uVector, vVector;
 
 	Scene();
 	Scene(Camera c);
-	void buildScene(string filename);
-	vector<double> calculateRay(int i, int j);
+	void buildScenePA3(string filename);
+	void buildScenePA4(string filename);
+	vector<double> calculateRayForTriangle(int i, int j);
 	double calculateT(vector <double> ray);
 	vector<unsigned int> colorPixel(double t, double tmin, double tmax);
 };

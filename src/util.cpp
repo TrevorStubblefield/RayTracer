@@ -119,7 +119,7 @@ Camera ReadCameraFile(string filename){
 	vector<double> eye;
 	vector<double> look;
 	vector<double> up;
-	double distance;
+	double distance = 0;
 	vector<double> bounds;
 	vector<double> res;
 	vector<double> ambient;

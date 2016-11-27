@@ -1,5 +1,6 @@
 //Camera Class
 
+#include <unordered_map>
 #include <vector>
 #include <math.h>
 #include <sstream>

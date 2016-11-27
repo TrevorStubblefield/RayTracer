@@ -39,6 +39,11 @@ Scene::Scene(Camera c) {
 	width = camera.res[0];
 	height = camera.res[1];
 
+	ambient = camera.ambient;
+	lights = camera.lights;
+	spheres = camera.spheres;
+	models = camera.models;
+
 	//Calculate U,V,W
 	wVector = vectorSubtraction(camera.eye, camera.look);
 	wVector = vectorNormalize(wVector);
@@ -49,7 +54,7 @@ Scene::Scene(Camera c) {
 	vVector = vectorCrossProduct(wVector, uVector);
 }
 
-void Scene::buildScene(string filename) {
+void Scene::buildScenePA3(string filename) {
 
 	vector<Face> faces = model.getFaces();
 	vector<Vertex> vertices = model.getVertices();
@@ -96,8 +101,12 @@ void Scene::buildScene(string filename) {
 	}
 }
 
+void Scene::buildScenePA4(string filename) {
+	
+}
 
-vector<double> Scene::calculateRay(int i , int j) {
+
+vector<double> Scene::calculateRayForTriangle(int i , int j) {
 	double px = i / (width - 1)*(right - left) + left;
 	px *= width / height;
 	double py = j / (height - 1)*(top - bottom) + bottom;
