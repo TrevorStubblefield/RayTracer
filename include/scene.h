@@ -20,7 +20,7 @@ public:
 	vector<double> wVector, uVector, vVector;
 
 	Scene();
-	Scene(Camera c, Model m);
+	Scene(Camera c);
 	void buildScene(string filename);
 	vector<double> calculateRay(int i, int j);
 	double calculateT(vector <double> ray);

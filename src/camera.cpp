@@ -11,13 +11,18 @@
 using namespace std;
 
 Camera::Camera() {}
-Camera::Camera(vector<double> a, vector<double> b, vector<double> c, vector<double> d, vector<double> e, vector<double> f) {
-	eye = a;
-	look = b;
-	up = c;
-	distance = d;
-	bounds = e;
-	res = f;
+Camera::Camera(vector<double> eye, vector<double> look, vector<double> up, double distance, vector<double> bounds, vector<double> res, vector<double> ambient,
+	unordered_map<string, vector<double>> lights, unordered_map<string, vector<double>> spheres, unordered_map<string, Model> models) {
+	this->eye = eye;
+	this->look = look;
+	this->up = up;
+	this->distance = distance;
+	this->bounds = bounds;
+	this->res = res;
+	this->ambient = ambient;
+	this->lights = lights;
+	this->spheres = spheres;
+	this->models = models;
 }
 string Camera::toString(){
 	string s = "";
@@ -37,9 +42,7 @@ string Camera::toString(){
 	}
 	s += "\n";
 
-	for (int i = 0; i < distance.size(); i++) {
-		s += to_string(distance[i]) + " ";
-	}
+	s += to_string(distance) + " ";
 	s += "\n";
 
 	for (int i = 0; i < bounds.size(); i++) {

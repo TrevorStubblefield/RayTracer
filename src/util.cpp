@@ -113,12 +113,19 @@ int WritePLYFile(string filename, Model model){
 Camera ReadCameraFile(string filename){
 
 	int i = 1;
-	vector<double> a;
-	vector<double> b;
-	vector<double> c;
-	vector<double> d;
-	vector<double> e;
-	vector<double> f;
+	int numberOfLights = 0;
+	int numberOfSpheres = 0;
+	int numberOfModels = 0;
+	vector<double> eye;
+	vector<double> look;
+	vector<double> up;
+	double distance;
+	vector<double> bounds;
+	vector<double> res;
+	vector<double> ambient;
+	unordered_map<string, vector<double>> lights;
+	unordered_map<string, vector<double>> spheres;
+	unordered_map<string, Model> models;
 
 	string line;
 	ifstream input;
@@ -126,6 +133,7 @@ Camera ReadCameraFile(string filename){
 
 	if (input.is_open()){
 		while( getline(input,line) ){
+			vector<double> temp;
 			int index = line.find(' ');
 			string fixedLine = line.substr(index, line.length()-1);
 
@@ -133,24 +141,53 @@ Camera ReadCameraFile(string filename){
 			stringstream ss(fixedLine);
     		while (ss >> buf){
         		if (i == 1)
-					a.push_back(stod(buf));
+					eye.push_back(stod(buf));
 				else if (i == 2)
-					b.push_back(stod(buf));
+					look.push_back(stod(buf));
 				else if (i == 3)
-					c.push_back(stod(buf));
+					up.push_back(stod(buf));
 				else if (i == 4)
-					d.push_back(stod(buf));
+					distance = stod(buf);
 				else if (i == 5)
-					e.push_back(stod(buf));
+					bounds.push_back(stod(buf));
 				else if (i == 6)
-					f.push_back(stod(buf));
+					res.push_back(stod(buf));
+				else if (line.find("ambient") != string::npos) {
+					ambient.push_back(stod(buf));
+				}
+				else if (line.find("light") != string::npos) {
+					temp.push_back(stod(buf));
+				}
+				else if (line.find("sphere") != string::npos) {
+					temp.push_back(stod(buf));
+				}
         	}
-
+			if (line.find("light") != string::npos) {
+				numberOfLights++;
+				pair<std::string, vector<double>> light("light" + to_string(numberOfLights), temp);
+				lights.insert(light);
+			}
+			else if (line.find("sphere") != string::npos) {
+				numberOfSpheres++;
+				pair<std::string, vector<double>> light("sphere" + to_string(numberOfSpheres), temp);
+				spheres.insert(light);
+			}
+			else if (line.find("model") != string::npos) {
+				numberOfModels++;
+				Model model = ReadPLYFile(fixedLine);
+				pair<std::string, Model> light("model" + to_string(numberOfModels), model);
+				models.insert(light);
+			}
 			i++;
 		}
 	}
-	return Camera(a,b,c,d,e,f);
+	return Camera(eye, look, up, distance, bounds, res, ambient, lights, spheres, models);
 }
+
+Model ReadOBJFile(string filename) {
+	return Model();
+}
+
 
 vector<double> vectorSubtraction(vector<double> a, vector<double> b){
 	vector <double> c;

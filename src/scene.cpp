@@ -14,9 +14,8 @@
 using namespace std;
 
 Scene::Scene() {}
-Scene::Scene(Camera c, Model m) {
+Scene::Scene(Camera c) {
 	camera = c;
-	model = m;
 
 	ex = camera.eye[0];
 	ey = camera.eye[1];
@@ -35,7 +34,7 @@ Scene::Scene(Camera c, Model m) {
 	top = camera.bounds[2];
 	right = camera.bounds[3];
 
-	near = -camera.distance[0];
+	near = -camera.distance;
 
 	width = camera.res[0];
 	height = camera.res[1];

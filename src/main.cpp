@@ -12,9 +12,10 @@ using namespace std;
 
 int mainPA1(int args, const char* argv[]);
 int mainPA2(int args, const char* argv[]);
+int mainPA3(int args, const char* argv[]);
 
 int main(int args, const char* argv[]){
-	return mainPA2(args, argv);
+	return mainPA3(args, argv);
 }
 
 int mainPA1(int args, const char* argv[]){
@@ -93,11 +94,21 @@ int mainPA2(int args, const char* argv[]){
 	Model model = ReadPLYFile(modelFile);
 	Camera camera = ReadCameraFile(cameraFile);
 
-	Scene scene(camera, model);
+	Scene scene(camera);
 
 	scene.buildScene(outputFile);
 
 	system("pause");
 
+	return 0;
+}
+
+int mainPA3(int args, const char* argv[]) {
+
+	string cameraFile = string(argv[1]);
+	Camera camera = ReadCameraFile(cameraFile);
+
+	system("pause");
+	
 	return 0;
 }

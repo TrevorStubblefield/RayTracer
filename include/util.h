@@ -12,6 +12,7 @@ using namespace std;
 Model ReadPLYFile(string filename);
 int WritePLYFile(string filename, Model model);
 Camera ReadCameraFile(string filename);
+Model ReadOBJFile(string filename);
 
 vector<double> vectorSubtraction(vector<double> a, vector<double> b);
 vector<double> vectorAddition(vector<double> a, vector<double> b);
