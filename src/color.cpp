@@ -33,9 +33,19 @@ Color Color::operator=(Color other) {
 }
 
 string Color::printColorsUInt() {
-	unsigned int UIntRed = static_cast<unsigned int>(red + 0.5);
-	unsigned int UIntGreen = static_cast<unsigned int>(green + 0.5);
-	unsigned int UIntBlue = static_cast<unsigned int>(blue + 0.5);
+	double scaledRed = red * 255;
+	double scaledGreen = green * 255;
+	double scaledBlue = blue * 255;
+	unsigned int UIntRed = static_cast<unsigned int>(scaledRed + 0.5);
+	unsigned int UIntGreen = static_cast<unsigned int>(scaledGreen + 0.5);
+	unsigned int UIntBlue = static_cast<unsigned int>(scaledBlue + 0.5);
+
+	if (UIntRed > 255)
+		UIntRed = 255;
+	if (UIntGreen > 255)
+		UIntGreen = 255;
+	if (UIntBlue > 255)
+		UIntBlue = 255;
 	string s = to_string(UIntRed) + " " + to_string(UIntGreen) + " " + to_string(UIntBlue) + " ";
 	return s;
 }

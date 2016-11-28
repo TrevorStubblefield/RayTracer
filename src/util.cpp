@@ -12,6 +12,7 @@
 #include "camera.h"
 #include "color.h"
 #include "sphere.h"
+#include "light.h"
 
 using namespace std;
 
@@ -124,7 +125,7 @@ Camera ReadCameraFile(string filename){
 	vector<double> bounds;
 	vector<double> res;
 	vector<double> ambient;
-	unordered_map<string, vector<double>> lights;
+	vector<Light> lights;
 	vector<Sphere> spheres;
 	vector<Model> models;
 
@@ -164,9 +165,8 @@ Camera ReadCameraFile(string filename){
 				}
         	}
 			if (line.find("light") != string::npos) {
-				numberOfLights++;
-				pair<std::string, vector<double>> light("light" + to_string(numberOfLights), temp);
-				lights.insert(light);
+				Light light(temp);
+				lights.push_back(light);
 			}
 			else if (line.find("sphere") != string::npos) {
 				Sphere sphere(temp);

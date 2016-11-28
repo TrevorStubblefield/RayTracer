@@ -6,6 +6,7 @@
 #include "face.h"
 #include "ray.h"
 #include "surface.h"
+#include "light.h"
 
 using namespace std;
 
@@ -19,7 +20,7 @@ public:
 	double near;
 	double width, height;
 	Color ambient;
-	unordered_map<string, vector<double>> lights;
+	vector<Light> lights;
 	vector<Sphere> spheres;
 	vector<Model> models;
 	vector<double> wVector, uVector, vVector;
@@ -30,6 +31,7 @@ public:
 	Ray calculateRay(int i, int j);
 	Surface calculateIntersect(Ray ray);
 	vector<double> colorPixel(double t, double tmin, double tmax);
+	Color colorPixelPA4(Surface surface, Ray ray);
 };
 
 

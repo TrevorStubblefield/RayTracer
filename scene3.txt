@@ -1,0 +1,10 @@
+eye 4 4 6
+look 0 0 0
+up 0 1 0
+d 2
+bounds -1 -1 1 1
+res 512 512
+ambient 0 0 0
+light 4 2 1 1 0.6 0.1 0.0
+light -4 2 1 1 0.5 0.5 0.5
+model cow_centered.obj

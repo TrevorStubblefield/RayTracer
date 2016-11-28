@@ -7,6 +7,7 @@
 #include "vertex.h"
 #include "face.h"
 #include "sphere.h"
+#include "light.h"
 
 using namespace std;
 
@@ -20,13 +21,13 @@ public:
 	vector<double> bounds;
 	vector<double> res;
 	Color ambient;
-	unordered_map<string, vector<double>> lights;
+	vector<Light> lights;
 	vector<Sphere> spheres;
 	vector<Model> models;
 
 	Camera();
 	Camera(vector<double> eye, vector<double> look, vector<double> up, double distance, vector<double> bounds, vector<double> res, Color ambient,
-		unordered_map<string, vector<double>> lights, vector<Sphere> spheres, vector<Model> models);
+		vector<Light> lights, vector<Sphere> spheres, vector<Model> models);
 	string toString();
 };
 

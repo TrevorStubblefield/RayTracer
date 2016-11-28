@@ -9,7 +9,9 @@ using namespace std;
 class Color
 {
 public:
-	double red, green, blue;
+	double red = 0; 
+	double green = 0;
+	double blue = 0;
 
 	Color();
 	Color(vector <double> c);

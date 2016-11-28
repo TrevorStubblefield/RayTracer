@@ -69,32 +69,22 @@ void Scene::buildScene(string filename) {
 	double tmin = INFINITY;
 	double tmax = 0;
 
-
-	for (int i = 0; i < height; i++) {
-		tRows.clear();
-		for (int j = width-1; j >= 0; j--) {
-
-			ray = calculateRay(j, i);
-			Surface surface = calculateIntersect(ray);
-			t = surface.distance;
-			tRows.push_back(t);
-			if (t < tmin)
-				tmin = t;
-			if (t != INFINITY && t > tmax)
-				tmax = t;
-		}
-		tMatrix.push_back(tRows);
-	}
-
 	ofstream outfile(filename);
 	if (outfile.is_open())
 	{
 		outfile << "P3\n";
 		outfile << width << " " << height << " 255\n";
 		for (int i = height - 1; i >= 0; i--) {
-			for (int j = width-1; j >= 0; j--) {
-				Color p = colorPixel(tMatrix[i][j], tmin, tmax);
-				outfile << p.printColorsUInt();
+			for (int j = 0; j < width; j++) {
+				Color pixel = Color();
+				ray = calculateRay(j, i);
+				Surface surface = calculateIntersect(ray);
+				t = surface.distance;
+				if (t > 0) {
+					pixel = colorPixelPA4(surface,ray);
+				}
+				
+				outfile << pixel.printColorsUInt();
 			}
 			outfile << "\n";
 		}
@@ -134,6 +124,46 @@ vector<double> Scene::colorPixel(double t, double tmin, double tmax) {
 	return coloredPixel;
 }
 
+Color Scene::colorPixelPA4(Surface surface, Ray ray) {
+
+	Color surfaceAmbient = surface.ambient;
+	Color surfaceDiffuse = surface.diffuse;
+	Color surfaceSpecular = surface.specular;
+
+	vector<double> currentColor;
+
+	Color color = ambient;
+	color.red *= surfaceAmbient.red;
+	color.green *= surfaceAmbient.green;
+	color.blue *= surfaceAmbient.blue;
+
+	for (Light light : lights) {
+		vector<double> lightCoordinates = light.coordinates;
+		Color lightColor = light.colors;
+		vector<double> intersectPoint = surface.point;
+		vector<double> toL = vectorSubtraction(lightCoordinates, intersectPoint);
+		toL = vectorNormalize(toL);
+		double nDotL = vectorDotProduct(surface.surfaceNormal, toL);
+		if (nDotL > 0.0) {
+			color.red += (surfaceDiffuse.red * lightColor.red * nDotL);
+			color.green += (surfaceDiffuse.green * lightColor.green * nDotL);
+			color.blue += (surfaceDiffuse.blue * lightColor.blue * nDotL);
+			vector<double> toC = vectorSubtraction(ray.origin, intersectPoint);
+			toC = vectorNormalize(toC);
+			vector<double> surfaceNormalScaled = vectorScalar(surface.surfaceNormal, 2);
+			vector<double> surfaceNormalScalednDotL = vectorScalar(surfaceNormalScaled, nDotL);
+			vector<double> spR = vectorSubtraction(surfaceNormalScalednDotL, toL);
+			spR = vectorNormalize(spR);
+			double cDotspR = vectorDotProduct(toC,spR);
+			color.red += (surfaceSpecular.red * lightColor.red * (pow(cDotspR, 16)));
+			color.green += (surfaceSpecular.green * lightColor.green * (pow(cDotspR, 16)));
+			color.blue += (surfaceSpecular.blue * lightColor.blue * (pow(cDotspR, 16)));
+		}
+	}
+
+	return color;
+}
+
 Surface Scene::calculateIntersect(Ray ray) {
 
 	double minDistance = INFINITY;
@@ -141,6 +171,7 @@ Surface Scene::calculateIntersect(Ray ray) {
 	vector<double> surfaceNormal;
 	Color ambient, diffuse, specular;
 
+	//Face intersection
 	for (unsigned int currentModel = 0; currentModel < models.size(); currentModel++) {
 		vector<Face> *faces = &models[currentModel].faces;
 
@@ -211,6 +242,7 @@ Surface Scene::calculateIntersect(Ray ray) {
 		}
 	}
 
+	//Sphere intersection
 	for (unsigned int currentSphere = 0; currentSphere < spheres.size(); currentSphere++) {
 		Sphere sphere = spheres[currentSphere];
 		double tval;
@@ -233,5 +265,8 @@ Surface Scene::calculateIntersect(Ray ray) {
 		}
 	}
 
+	if (minDistance == INFINITY) {
+		minDistance = -1;
+	}
 	return Surface(minDistance, intesectPoint, surfaceNormal, ambient, diffuse, specular);
 }

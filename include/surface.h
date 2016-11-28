@@ -2,13 +2,13 @@
 #define SURFACE_H
 
 #include <vector>
-#include "surface.h"
+#include "color.h"
 using namespace std;
 
 
 class Surface {
 public:
-	double distance;
+	double distance = -1;
 	vector<double> point;
 	vector<double> surfaceNormal;
 	Color ambient, diffuse, specular;
