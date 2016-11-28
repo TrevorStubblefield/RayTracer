@@ -6,6 +6,7 @@
 #include "model.h"
 #include "vertex.h"
 #include "face.h"
+#include "sphere.h"
 
 using namespace std;
 
@@ -18,14 +19,14 @@ public:
 	double distance;
 	vector<double> bounds;
 	vector<double> res;
-	vector<double> ambient;
+	Color ambient;
 	unordered_map<string, vector<double>> lights;
-	unordered_map<string, vector<double>> spheres;
-	unordered_map<string, Model> models;
+	vector<Sphere> spheres;
+	vector<Model> models;
 
 	Camera();
-	Camera(vector<double> eye, vector<double> look, vector<double> up, double distance, vector<double> bounds, vector<double> res, vector<double> ambient, 
-		unordered_map<string, vector<double>> lights, unordered_map<string, vector<double>> spheres, unordered_map<string, Model> models);
+	Camera(vector<double> eye, vector<double> look, vector<double> up, double distance, vector<double> bounds, vector<double> res, Color ambient,
+		unordered_map<string, vector<double>> lights, vector<Sphere> spheres, vector<Model> models);
 	string toString();
 };
 

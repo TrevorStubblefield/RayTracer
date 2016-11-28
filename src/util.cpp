@@ -10,7 +10,8 @@
 #include "model.h"
 #include "util.h"
 #include "camera.h"
-#include "pixel.h"
+#include "color.h"
+#include "sphere.h"
 
 using namespace std;
 
@@ -62,14 +63,14 @@ Model ReadPLYFile(string filename){
     				stringstream ss(line);
     				vector<int> tokens;
     				ss >> buf;
-    				int size = stod(buf);
+    				int size = stoi(buf);
     				while (ss >> buf){
-        				tokens.push_back(stod(buf));
+        				tokens.push_back(stoi(buf));
         			}
 					Vertex a = vertexMap[tokens[0]];
 					Vertex b = vertexMap[tokens[1]];
 					Vertex c = vertexMap[tokens[2]];
-        			Face f(a, b, c);
+        			Face f(a, b, c, Color(), Color(), Color());
         			faces.push_back(f);
 				}
 			}
@@ -99,10 +100,10 @@ int WritePLYFile(string filename, Model model){
 		outfile << "element face " + s + "\n";
 		outfile << "property list uint8 int32 vertex_indices\n";
 		outfile << "end_header\n";
-		for (int i = 0; i < vertices.size(); i++){
+		for (unsigned int i = 0; i < vertices.size(); i++){
 			outfile << vertices[i].toString() + "\n";
 		}
-		for (int i = 0; i < faces.size(); i++) {
+		for (unsigned int i = 0; i < faces.size(); i++) {
 			outfile << faces[i].toString() + "\n";
 		}
 	}
@@ -124,8 +125,8 @@ Camera ReadCameraFile(string filename){
 	vector<double> res;
 	vector<double> ambient;
 	unordered_map<string, vector<double>> lights;
-	unordered_map<string, vector<double>> spheres;
-	unordered_map<string, Model> models;
+	vector<Sphere> spheres;
+	vector<Model> models;
 
 	string line;
 	ifstream input;
@@ -168,15 +169,13 @@ Camera ReadCameraFile(string filename){
 				lights.insert(light);
 			}
 			else if (line.find("sphere") != string::npos) {
-				numberOfSpheres++;
-				pair<std::string, vector<double>> light("sphere" + to_string(numberOfSpheres), temp);
-				spheres.insert(light);
+				Sphere sphere(temp);
+				spheres.push_back(sphere);
 			}
 			else if (line.find("model") != string::npos) {
 				numberOfModels++;
-				Model model = ReadPLYFile(fixedLine);
-				pair<std::string, Model> light("model" + to_string(numberOfModels), model);
-				models.insert(light);
+				Model model = ReadOBJFile(fixedLine.substr(1));
+				models.push_back(model);
 			}
 			i++;
 		}
@@ -185,7 +184,149 @@ Camera ReadCameraFile(string filename){
 }
 
 Model ReadOBJFile(string filename) {
-	return Model();
+	string line;
+	ifstream input;
+	string currentMTLID;
+	string MTLFile;
+
+	unordered_map<int, Vertex> vertexMap;
+
+	vector<Vertex> vertices;
+	vector<Face> faces;
+
+	int numVertices = 1;
+	int numFaces = 0;
+
+	input.open(filename);
+
+	if (input.is_open()) {
+		while (getline(input, line)) {
+
+			if (line.find("usemtl ") != string::npos) {
+				int index = line.find(' ');
+				currentMTLID = line.substr(index+1, line.length() - 1);
+			}
+
+			if (line.find("mtllib ") != string::npos) {
+				int index = line.find(' ');
+				MTLFile = line.substr(index+1, line.length() - 1);
+			}
+			
+			if (line.find("v ") != string::npos) {
+				int index = line.find(' ');
+				string fixedLine = line.substr(index, line.length() - 1);
+				string buf;
+				stringstream ss(fixedLine);
+				vector<double> tokens;
+				while (ss >> buf) {
+					tokens.push_back(stod(buf));
+				}
+				Vertex v(numVertices, tokens);
+				vertices.push_back(v);
+				vertexMap.insert({ numVertices, v });
+				numVertices++;
+			}
+
+			if (line.find("f ") != string::npos) {
+				vector<string> strings;
+				istringstream iss(line);
+				do
+				{
+					std::string sub;
+					iss >> sub;
+
+					strings.push_back(sub);
+				} while (iss);
+
+				int slashA = strings[1].find('/');
+				string numberA = strings[1].substr(0, slashA);
+
+				int slashB = strings[2].find('/');
+				string numberB = strings[2].substr(0, slashB);
+
+				int slashC = strings[3].find('/');
+				string numberC = strings[3].substr(0, slashC);
+
+				int a = atoi(numberA.c_str());
+				int b = atoi(numberB.c_str());
+				int c = atoi(numberC.c_str());
+
+				Vertex vertexA = vertexMap[a];
+				Vertex vertexB = vertexMap[b];
+				Vertex vertexC = vertexMap[c];
+
+				vector<Color> reflections = ReadMTLFile(MTLFile, currentMTLID);
+
+				Face f(vertexA, vertexB, vertexC, reflections[0], reflections[1], reflections[2]);
+				faces.push_back(f);
+			}
+		}
+	}
+	input.close();
+	Model m(vertices, faces);
+	return m;
+}
+
+vector<Color> ReadMTLFile(string filename, string MTLID) {
+
+	string line;
+	ifstream input;
+
+	Color ambient, diffuse, specular;
+	vector<Color> reflections;
+
+	input.open(filename);
+
+	if (input.is_open()) {
+		while (getline(input, line)) {
+			if (line.find("newmtl "+MTLID) != string::npos) {
+				while (getline(input, line)) {
+
+					if (line.find("Ka ") != string::npos) {
+						int index = line.find(' ');
+						string fixedLine = line.substr(index, line.length() - 1);
+						string buf;
+						stringstream ss(fixedLine);
+						vector<double> tokens;
+						while (ss >> buf) {
+							tokens.push_back(stod(buf));
+						}
+						ambient = tokens;
+					}
+
+					if (line.find("Kd ") != string::npos) {
+						int index = line.find(' ');
+						string fixedLine = line.substr(index, line.length() - 1);
+						string buf;
+						stringstream ss(fixedLine);
+						vector<double> tokens;
+						while (ss >> buf) {
+							tokens.push_back(stod(buf));
+						}
+						diffuse = tokens;
+					}
+
+					if (line.find("Ks ") != string::npos) {
+						int index = line.find(' ');
+						string fixedLine = line.substr(index, line.length() - 1);
+						string buf;
+						stringstream ss(fixedLine);
+						vector<double> tokens;
+						while (ss >> buf) {
+							tokens.push_back(stod(buf));
+						}
+						specular = tokens;
+					}
+
+				}
+			}
+		}
+	}
+	input.close();
+	reflections.push_back(ambient);
+	reflections.push_back(diffuse);
+	reflections.push_back(specular);
+	return reflections;
 }
 
 
@@ -226,5 +367,8 @@ vector<double> vectorCrossProduct(vector<double> a, vector<double> b){
 	c.push_back( (a[0]*b[1]) - (a[1]*b[0]) );
 
 	return c;
+}
+double vectorDotProduct(vector<double> a, vector<double> b) {
+	return (a[0] * b[0]) + (a[1]*b[1]) + (a[2]*b[2]);
 }
 

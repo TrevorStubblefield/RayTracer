@@ -4,29 +4,28 @@
 #include <string>
 #include "face.h"
 #include "vertex.h"
+#include "color.h"
+#include "util.h"
 
 using namespace std;
 
 Face::Face(){}
 
-Face::Face(int s, vector<int> v){
-	size = s;
-	vec = v;
-	idA = v[0];
-	idB = v[1];
-	idC = v[2];
-}
-
-Face::Face(Vertex a, Vertex b, Vertex c) {
+Face::Face(Vertex a, Vertex b, Vertex c, Color ambient, Color diffuse, Color specular){
 	v1 = a;
 	v2 = b;
 	v3 = c;
+	this->ambient = ambient;
+	this->diffuse = diffuse;
+	this->specular = specular;
+
+	vector<double> U = vectorSubtraction(v2.getTriangle(), v1.getTriangle());
+	vector<double> V = vectorSubtraction(v3.getTriangle(), v1.getTriangle());
+	surfaceNormal = vectorCrossProduct(U, V);
+	surfaceNormal = vectorNormalize(surfaceNormal);
 }
 
-string Face::toString(){
-	string s = to_string(size) + " ";
-	for (int i = 0; i < vec.size(); i++) {
-		s += to_string(vec[i]) + " ";
-	}
+string Face::toString() {
+	string s = v1.toString() + v2.toString() + v3.toString();
 	return s;
 }

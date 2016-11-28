@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <vector>
 #include "model.h"
 #include "vertex.h"
@@ -96,7 +97,7 @@ int mainPA2(int args, const char* argv[]){
 
 	Scene scene(camera);
 
-	scene.buildScenePA3(outputFile);
+	scene.buildScene(outputFile);
 
 	system("pause");
 
@@ -111,8 +112,13 @@ int mainPA3(int args, const char* argv[]) {
 
 	Scene scene(camera);
 
-	scene.buildScenePA4(outputFile);
-	//system("pause");
+	scene.buildScene(outputFile);
+
+
+	system("pause");
 	
 	return 0;
 }
+
+//ctrl k ctrl c
+//ctrl k ctrl u

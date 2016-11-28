@@ -9,7 +9,9 @@
 #include "util.h"
 #include "face.h"
 #include "vertex.h"
-#include "pixel.h"
+#include "color.h"
+#include "ray.h"
+#include "surface.h"
 
 using namespace std;
 
@@ -54,12 +56,9 @@ Scene::Scene(Camera c) {
 	vVector = vectorCrossProduct(wVector, uVector);
 }
 
-void Scene::buildScenePA3(string filename) {
+void Scene::buildScene(string filename) {
 
-	vector<Face> faces = model.getFaces();
-	vector<Vertex> vertices = model.getVertices();
-
-	vector<double> ray;
+	Ray ray;
 	vector<double> tVector;
 	vector<unsigned int> coloredPixel;
 
@@ -76,7 +75,8 @@ void Scene::buildScenePA3(string filename) {
 		for (int j = width-1; j >= 0; j--) {
 
 			ray = calculateRay(j, i);
-			t = calculateT(ray);
+			Surface surface = calculateIntersect(ray);
+			t = surface.distance;
 			tRows.push_back(t);
 			if (t < tmin)
 				tmin = t;
@@ -93,20 +93,15 @@ void Scene::buildScenePA3(string filename) {
 		outfile << width << " " << height << " 255\n";
 		for (int i = height - 1; i >= 0; i--) {
 			for (int j = width-1; j >= 0; j--) {
-				Pixel p = colorPixel(tMatrix[i][j], tmin, tmax);
-				outfile << p.printColors();
+				Color p = colorPixel(tMatrix[i][j], tmin, tmax);
+				outfile << p.printColorsUInt();
 			}
 			outfile << "\n";
 		}
 	}
 }
 
-void Scene::buildScenePA4(string filename) {
-	
-}
-
-
-vector<double> Scene::calculateRayForTriangle(int i , int j) {
+Ray Scene::calculateRay(int i , int j) {
 	double px = i / (width - 1)*(right - left) + left;
 	px *= width / height;
 	double py = j / (height - 1)*(top - bottom) + bottom;
@@ -118,15 +113,16 @@ vector<double> Scene::calculateRayForTriangle(int i , int j) {
 	vector<double> ray = vectorSubtraction(pixpt, camera.eye);
 	ray = vectorNormalize(ray);
 
-	return ray;
+	Ray rayObject(ray, pixpt);
+	return rayObject;
 }
 
-vector<unsigned int> Scene::colorPixel(double t, double tmin, double tmax) {
+vector<double> Scene::colorPixel(double t, double tmin, double tmax) {
 	
 	double ratio = 2 * (t - tmin) / (tmax - tmin);
-	unsigned int r = fmax(0, 255 * (1 - ratio));
-	unsigned int b = fmax(0, 255 * (ratio - 1));
-	unsigned int g = 255 - b - r;
+	double r = fmax(0, 255 * (1 - ratio));
+	double b = fmax(0, 255 * (ratio - 1));
+	double g = 255 - b - r;
 
 	if (t >= INFINITY) {
 		r = 239;
@@ -134,75 +130,108 @@ vector<unsigned int> Scene::colorPixel(double t, double tmin, double tmax) {
 		g = 239;
 	}
 
-	vector<unsigned int> coloredPixel = {r,b,g};
+	vector<double> coloredPixel = {r,g,b};
 	return coloredPixel;
 }
 
-double Scene::calculateT(vector <double> ray) {
-	//x = 0, y = 1, z = 2
-	vector<Face> *faces = &model.faces;
+Surface Scene::calculateIntersect(Ray ray) {
 
 	double minDistance = INFINITY;
-	double t = -1;
+	vector<double> intesectPoint;
+	vector<double> surfaceNormal;
+	Color ambient, diffuse, specular;
 
-	for (int currentFace = 0; currentFace < faces->size(); currentFace++) {
+	for (unsigned int currentModel = 0; currentModel < models.size(); currentModel++) {
+		vector<Face> *faces = &models[currentModel].faces;
 
-		Vertex* vertex1 = &(faces->at(currentFace).v1);
-		Vertex* vertex2 = &(faces->at(currentFace).v2);
-		Vertex* vertex3 = &(faces->at(currentFace).v3);
-		
-		double ax = vertex1->xCoordinate;
-		double ay = vertex1->yCoordinate;
-		double az = vertex1->zCoordinate;
+		double t = -1;
 
-		double bx = vertex2->xCoordinate;
-		double by = vertex2->yCoordinate;
-		double bz = vertex2->zCoordinate;
+		for (unsigned int currentFace = 0; currentFace < faces->size(); currentFace++) {
 
-		double cx = vertex3->xCoordinate;
-		double cy = vertex3->yCoordinate;
-		double cz = vertex3->zCoordinate;
+			Vertex* vertex1 = &(faces->at(currentFace).v1);
+			Vertex* vertex2 = &(faces->at(currentFace).v2);
+			Vertex* vertex3 = &(faces->at(currentFace).v3);
 
-		double dx = ray[0];
-		double dy = ray[1];
-		double dz = ray[2];
+			double ax = vertex1->xCoordinate;
+			double ay = vertex1->yCoordinate;
+			double az = vertex1->zCoordinate;
 
-		double lx = camera.eye[0];
-		double ly = camera.eye[1];
-		double lz = camera.eye[2];
+			double bx = vertex2->xCoordinate;
+			double by = vertex2->yCoordinate;
+			double bz = vertex2->zCoordinate;
 
-		double a = (az - cz);
-		double b = (ay - cy);
-		double c = (ax - bx);
-		double d = (ax - cx);
-		double e = (az - bz);
-		double f = (ay - by);
-		double j = (a*dy - b*dz);
-		double k = (a*dx - d*dz);
-		double l = (b*dx - d*dy);
+			double cx = vertex3->xCoordinate;
+			double cy = vertex3->yCoordinate;
+			double cz = vertex3->zCoordinate;
 
-		double denom = (j*c) - (k*f) + (l*e);
-		if (denom != 0) {
-			double g = (ax - lx);
-			double h = (ay - ly);
-			double i = (az - lz);
+			double dx = ray.direction[0];
+			double dy = ray.direction[1];
+			double dz = ray.direction[2];
 
-			double beta = ((j*g) - (k*h) + (l*i)) / denom;
-			if (beta >= 0) {
+			double lx = ray.origin[0];
+			double ly = ray.origin[1];
+			double lz = ray.origin[2];
 
-				double gamma = (((i*dy - h*dz)*c) - ((i*dx - g*dz)*f) + ((h*dx - g*dy)*e)) / denom;
+			double a = (az - cz);
+			double b = (ay - cy);
+			double c = (ax - bx);
+			double d = (ax - cx);
+			double e = (az - bz);
+			double f = (ay - by);
+			double j = (a*dy - b*dz);
+			double k = (a*dx - d*dz);
+			double l = (b*dx - d*dy);
 
-				if ((gamma >= 0) && ((beta + gamma) <= 1)) {
+			double denom = (j*c) - (k*f) + (l*e);
+			if (denom != 0) {
+				double g = (ax - lx);
+				double h = (ay - ly);
+				double i = (az - lz);
 
-					t = (((h*a - b*i)*c) - ((g*a - d*i)*f) + ((g*b - d*h)*e)) / denom;
+				double beta = ((j*g) - (k*h) + (l*i)) / denom;
+				if (beta >= 0) {
 
-					if (t > 0 && t < minDistance) {
-						minDistance = t;
+					double gamma = (((i*dy - h*dz)*c) - ((i*dx - g*dz)*f) + ((h*dx - g*dy)*e)) / denom;
+
+					if ((gamma >= 0) && ((beta + gamma) <= 1)) {
+
+						t = (((h*a - b*i)*c) - ((g*a - d*i)*f) + ((g*b - d*h)*e)) / denom;
+
+						if (t > 0 && t < minDistance) {
+							minDistance = t;
+							intesectPoint = vectorAddition(ray.origin, vectorScalar(ray.direction, minDistance));
+							surfaceNormal = faces->at(currentFace).surfaceNormal;
+							ambient = faces->at(currentFace).ambient;
+							diffuse = faces->at(currentFace).diffuse;
+							specular = faces->at(currentFace).specular;
+						}
 					}
 				}
 			}
 		}
 	}
 
-	return minDistance;
+	for (unsigned int currentSphere = 0; currentSphere < spheres.size(); currentSphere++) {
+		Sphere sphere = spheres[currentSphere];
+		double tval;
+		double distance = -1;
+
+		vector <double> Tv = vectorSubtraction(sphere.coordinates, ray.origin);
+		double v = vectorDotProduct(Tv, ray.direction);
+		double csq = vectorDotProduct(Tv, Tv);
+		double disc = (sphere.radius*sphere.radius) - (csq - (v*v));
+		if (disc > 0) {
+			tval = v - sqrt(disc);
+			if (tval < minDistance && tval > 0.00001) {
+				minDistance = tval;
+				intesectPoint = vectorAddition(ray.origin, vectorScalar(ray.direction, minDistance));
+				surfaceNormal = vectorNormalize(vectorSubtraction(intesectPoint, sphere.coordinates));
+				ambient = sphere.ambient;
+				diffuse = sphere.diffuse;
+				specular = sphere.specular;
+			}
+		}
+	}
+
+	return Surface(minDistance, intesectPoint, surfaceNormal, ambient, diffuse, specular);
 }

@@ -27,7 +27,7 @@ Model Model::center() {
 	double meanY = mean.getY();
 	double meanZ = mean.getZ();
 
-	for (int i = 0; i < vertices.size(); i++){
+	for (unsigned int i = 0; i < vertices.size(); i++){
 		double newX = vertices[i].getX() - meanX;
 		double newY = vertices[i].getY() - meanY;
 		double newZ = vertices[i].getZ() - meanZ;
@@ -45,7 +45,7 @@ Model Model::round() {
 	double stdDevY = stdDev.getY();
 	double stdDevZ = stdDev.getZ();
 
-	for (int i = 0; i < vertices.size(); i++) {
+	for (unsigned int i = 0; i < vertices.size(); i++) {
 		double newX = vertices[i].getX() / stdDevX;
 		double newY = vertices[i].getY() / stdDevY;
 		double newZ = vertices[i].getZ() / stdDevZ;
@@ -62,7 +62,7 @@ Vertex Model::findMean(){
 	double meanY = 0;
 	double meanZ = 0;
 
-	for (int i = 0; i < vertices.size(); i++) {
+	for (unsigned int i = 0; i < vertices.size(); i++) {
 		meanX += vertices[i].getX();
 		meanY += vertices[i].getY();
 		meanZ += vertices[i].getZ();
@@ -88,7 +88,7 @@ Vertex Model::findStdDev(){
 	double stdDevY = 0;
 	double stdDevZ = 0;
 
-	for (int i = 0; i < vertices.size(); i++) {
+	for (unsigned int i = 0; i < vertices.size(); i++) {
 		varianceX += (vertices[i].getX() - meanX)*(vertices[i].getX() - meanX);
 		varianceY += (vertices[i].getY() - meanY)*(vertices[i].getY() - meanY);
 		varianceZ += (vertices[i].getZ() - meanZ)*(vertices[i].getZ() - meanZ);
@@ -114,7 +114,7 @@ string Model::boundingBox(){
 	double maxY = vertices[0].getY();
 	double maxZ = vertices[0].getZ();
 
-	for (int i = 0; i < vertices.size(); i++){
+	for (unsigned int i = 0; i < vertices.size(); i++){
 		double currentX = vertices[i].getX();
 		double currentY = vertices[i].getY();
 		double currentZ = vertices[i].getZ();
@@ -151,7 +151,7 @@ string Model::boundingBox(){
 
 vector<double> Model::findTriangle(int id) {
 
-	for (int i = 0; i < vertices.size(); i++) {
+	for (unsigned int i = 0; i < vertices.size(); i++) {
 		if (vertices[i].id == id) {
 			return vertices[i].getTriangle();
 		}

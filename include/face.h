@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "vertex.h"
+#include "color.h"
 
 using namespace std;
 
@@ -10,13 +11,14 @@ class Face
 {
 public:
 	int size;
-	vector<int> vec;
-	int idA, idB, idC;
 	Vertex v1, v2, v3;
+	Color ambient;
+	Color diffuse;
+	Color specular;
+	vector<double> surfaceNormal;
 
-	Face ();
-	Face (int s, vector<int> v);
-	Face(Vertex a, Vertex b, Vertex c);
+	Face();
+	Face(Vertex a, Vertex b, Vertex c, Color ambient, Color diffuse, Color specular);
 	string toString();
 };
 
