@@ -1,1 +1,1 @@
-This a project that will be worked on over the course of CS410 Introduction to Computer Graphics. In the end, it will be a ray tracer implemented in C++.
+This is a RayTracer implemented in C++ that was for CS410 at Colorado State University. The project takes in .obj files and can create a rendered image based on many different specifications.
